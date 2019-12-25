@@ -6,6 +6,7 @@ import cors from 'cors'
 import { connect } from './utils/db'
 import userRouter from './resources/user/user.router'
 import { signin, signup, protect } from './utils/auth'
+import {listTopUsers} from "../dist/resources/user/user.controllers";
 
 export const app = express()
 
@@ -18,6 +19,7 @@ app.use(morgan('dev'))
 
 app.post('/signup', signup)
 app.post('/signin', signin)
+app.get('/most-liked', listTopUsers)
 
 app.use('/api', protect)
 app.use('/api/user', userRouter)

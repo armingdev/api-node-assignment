@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema(
   {
-    email: {
+    username: {
       type: String,
       required: true,
       unique: true,
@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
+    },
+    likes: {
+      type: Number,
+      default: 0
     },
     settings: {
       theme: {
