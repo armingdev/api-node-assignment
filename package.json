@@ -31,7 +31,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.3",
     "morgan": "^1.9.1",
-    "validator": "^12.1.0"
+    "validator": "^12.1.0",
+    "lodash": "latest"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",
@@ -55,6 +56,19 @@
     "eslint-plugin-standard": "^4.0.1",
     "jest": "^24.9.0",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2",
+    "rimraf": "^3.0.0",
+    "mock-req-res": "^1.1.4"
+  },
+  "jest": {
+    "verbose": true,
+    "testURL": "http://localhost/",
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/test-db-setup.js",
+    "testPathIgnorePatterns": [
+      "dist/"
+    ],
+    "restoreMocks": true
   }
 }

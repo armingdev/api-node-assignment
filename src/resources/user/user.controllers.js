@@ -1,4 +1,5 @@
 import { User } from './user.model'
+import * as jwt from "jsonwebtoken";
 
 export const me = (req, res) => {
   res.status(200).json({ data: req.user })
@@ -21,17 +22,18 @@ export const updateMe = async (req, res) => {
 
 export const likeUser = async (req, res) => {
   try {
-    console.log(req.body)
-    const user = await User.findByIdAndUpdate(req.params.id,
+    const currentUser = jwt.decode(req.headers.authorization.split('Bearer ')[1]);
+    const user = await User.findOneAndUpdate({
+          _id: req.params.id,
+          likesFromUsers:  { "$ne": currentUser.id }
+        },
         {
-          $inc: {
-            likes: 1
-          }
+          likesFromUsers: currentUser.id
         }, { new: true })
         .select('-password')
         .lean()
         .exec()
-    console.log(user)
+
     res.status(200).json({ data: user })
   } catch (e) {
     console.error(e)
@@ -41,11 +43,10 @@ export const likeUser = async (req, res) => {
 
 export const unlikeUser = async (req, res) => {
   try {
+    const currentUser = jwt.decode(req.headers.authorization.split('Bearer ')[1]);
     const user = await User.findByIdAndUpdate(req.params.id,
         {
-          $inc: {
-            likes: -1
-          }
+          $pull: { likesFromUsers: currentUser.id }
         }, { new: true })
         .select('-password')
         .lean()
@@ -61,7 +62,7 @@ export const unlikeUser = async (req, res) => {
 export const listTopUsers = async (req, res) => {
   try {
     const users = await User
-        .find({}).sort({likes: 1})
+        .find({}).sort({ 'likesFromUsers': -1 })
         .select('-password')
         .lean()
         .exec()

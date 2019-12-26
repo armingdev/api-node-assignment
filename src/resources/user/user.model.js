@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    likesFromUsers: [{
+      ref: 'user',
+      type: mongoose.Types.ObjectId,
+      default: []
+    }],
     settings: {
       theme: {
         type: String,
