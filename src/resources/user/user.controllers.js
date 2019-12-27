@@ -1,10 +1,11 @@
 import { User } from './user.model'
-import * as jwt from "jsonwebtoken";
 
+// Get logged user
 export const me = (req, res) => {
   res.status(200).json({ data: req.user })
 }
 
+// Update user from request body
 export const updateMe = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
@@ -20,15 +21,16 @@ export const updateMe = async (req, res) => {
   }
 }
 
+// Like user by id
 export const likeUser = async (req, res) => {
   try {
-    const currentUser = jwt.decode(req.headers.authorization.split('Bearer ')[1]);
+    const currentUser = req.user;
     const user = await User.findOneAndUpdate({
           _id: req.params.id,
-          likesFromUsers:  { "$ne": currentUser.id }
+          likesFromUsers:  { "$ne": currentUser._id }
         },
         {
-          likesFromUsers: currentUser.id
+          likesFromUsers: currentUser._id
         }, { new: true })
         .select('-password')
         .lean()
@@ -41,12 +43,13 @@ export const likeUser = async (req, res) => {
   }
 }
 
+// Unlike user by id
 export const unlikeUser = async (req, res) => {
   try {
-    const currentUser = jwt.decode(req.headers.authorization.split('Bearer ')[1]);
+    const currentUser = req.user;
     const user = await User.findByIdAndUpdate(req.params.id,
         {
-          $pull: { likesFromUsers: currentUser.id }
+          $pull: { likesFromUsers: currentUser._id }
         }, { new: true })
         .select('-password')
         .lean()
@@ -55,10 +58,11 @@ export const unlikeUser = async (req, res) => {
     res.status(200).json({ data: user })
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).send({ message: e.message })
   }
 }
 
+// List most liked users
 export const listTopUsers = async (req, res) => {
   try {
     const users = await User

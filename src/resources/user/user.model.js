@@ -14,10 +14,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    likes: {
-      type: Number,
-      default: 0
-    },
     likesFromUsers: [{
       ref: 'user',
       type: mongoose.Types.ObjectId,
@@ -42,34 +38,25 @@ const userSchema = new mongoose.Schema(
     }
   },
   { timestamps: true }
-)
+);
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     return next()
   }
+  try{
+    const hash = await bcrypt.hash(this.password, 8);
+    this.password = hash;
+    return next()
+  }catch(e){
+    // We're throwing error here because, the parent function will catch it.
+    throw e;
+  }
+});
 
-  bcrypt.hash(this.password, 8, (err, hash) => {
-    if (err) {
-      return next(err)
-    }
-
-    this.password = hash
-    next()
-  })
-})
-
-userSchema.methods.checkPassword = function(password) {
+userSchema.methods.checkPassword = async function(password) {
   const passwordHash = this.password
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, passwordHash, (err, same) => {
-      if (err) {
-        return reject(err)
-      }
-
-      resolve(same)
-    })
-  })
-}
+  return await bcrypt.compare(password, passwordHash);
+};
 
 export const User = mongoose.model('user', userSchema)

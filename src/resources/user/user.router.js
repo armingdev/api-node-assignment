@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {likeUser, me, unlikeUser, updateMe} from './user.controllers'
+import {protect} from "../../utils/auth";
 
 const router = Router()
 

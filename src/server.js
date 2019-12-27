@@ -5,8 +5,8 @@ import config from './config'
 import cors from 'cors'
 import { connect } from './utils/db'
 import userRouter from './resources/user/user.router'
-import { signin, signup, protect } from './utils/auth'
-import {listTopUsers} from "../dist/resources/user/user.controllers";
+import {signup, protect, login} from './utils/auth'
+import {listTopUsers} from "./resources/user/user.controllers";
 
 export const app = express()
 
@@ -18,11 +18,11 @@ app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
 app.post('/signup', signup)
-app.post('/signin', signin)
-app.get('/most-liked', listTopUsers)
+app.post('/login', login)
 
 app.use('/api', protect)
 app.use('/api/user', userRouter)
+app.get('/api/most-liked', listTopUsers)
 
 export const start = async () => {
     try {

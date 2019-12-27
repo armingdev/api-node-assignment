@@ -8,14 +8,12 @@ export const newToken = user => {
   })
 }
 
-export const verifyToken = token =>
-  new Promise((resolve, reject) => {
-    jwt.verify(token, config.secrets.jwt, (err, payload) => {
-      if (err) return reject(err)
-      resolve(payload)
-    })
-  })
+export const verifyToken = async token =>{
+  const payload = await jwt.verify(token, config.secrets.jwt);
+  return payload;
+}
 
+// Signup function
 export const signup = async (req, res) => {
   if (!req.body.username || !req.body.password) {
     return res.status(400).send({ message: 'Username and Password are required' })
@@ -30,7 +28,8 @@ export const signup = async (req, res) => {
   }
 }
 
-export const signin = async (req, res) => {
+// Login function
+export const login = async (req, res) => {
   if (!req.body.username || !req.body.password) {
     return res.status(400).send({ message: 'Username and Password are required' })
   }
@@ -54,18 +53,19 @@ export const signin = async (req, res) => {
   }
 }
 
+// Authorization middleware
 export const protect = async (req, res, next) => {
-  if (!req.headers.authorization) {
-    return res.status(401).end()
-  }
-
-  let token = req.headers.authorization.split('Bearer ')[1]
-
-  if (!token) {
-    return res.status(401).end()
-  }
 
   try {
+    if (!req.headers.authorization) {
+      throw new Error(`Unauthorized`)
+    }
+    const token = req.headers.authorization.split('Bearer ')[1]
+
+    if (!token) {
+      throw new Error(`Unauthorized`)
+    }
+
     const payload = await verifyToken(token)
     const user = await User.findById(payload.id)
       .select('-password')
@@ -74,7 +74,6 @@ export const protect = async (req, res, next) => {
     req.user = user
     next()
   } catch (e) {
-    console.error(e)
-    return res.status(401).end()
+    return res.status(401).send({message: `Unauthorized`})
   }
 }

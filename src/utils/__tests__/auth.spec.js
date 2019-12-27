@@ -1,4 +1,4 @@
-import { newToken, verifyToken, signup, signin, protect } from '../auth'
+import {newToken, verifyToken, signup, signin, protect, login} from '../auth'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import config from '../../config'
@@ -64,7 +64,7 @@ describe('Authentication:', () => {
         })
     })
 
-    describe('signin', () => {
+    describe('login', () => {
         test('requires username and password', async () => {
             expect.assertions(2)
 
@@ -79,7 +79,7 @@ describe('Authentication:', () => {
                 }
             }
 
-            await signin(req, res)
+            await login(req, res)
         })
 
         test('user must be real', async () => {
@@ -96,7 +96,7 @@ describe('Authentication:', () => {
                 }
             }
 
-            await signin(req, res)
+            await login(req, res)
         })
 
         test('passwords must match', async () => {
@@ -118,7 +118,7 @@ describe('Authentication:', () => {
                 }
             }
 
-            await signin(req, res)
+            await login(req, res)
         })
 
         test('creates new token', async () => {
@@ -144,7 +144,7 @@ describe('Authentication:', () => {
                 }
             }
 
-            await signin(req, res)
+            await login(req, res)
         })
     })
 
@@ -158,8 +158,8 @@ describe('Authentication:', () => {
                     expect(status).toBe(401)
                     return this
                 },
-                end() {
-                    expect(true).toBe(true)
+                send(result) {
+                    expect(typeof result.message).toBe('string')
                 }
             }
 
@@ -175,8 +175,8 @@ describe('Authentication:', () => {
                     expect(status).toBe(401)
                     return this
                 },
-                end() {
-                    expect(true).toBe(true)
+                send(result) {
+                    expect(typeof result.message).toBe('string')
                 }
             }
 
@@ -192,8 +192,8 @@ describe('Authentication:', () => {
                     expect(status).toBe(401)
                     return this
                 },
-                end() {
-                    expect(true).toBe(true)
+                send(result) {
+                    expect(typeof result.message).toBe('string')
                 }
             }
 
